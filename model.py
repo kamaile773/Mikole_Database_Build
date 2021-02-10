@@ -3,6 +3,8 @@
 from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
 
+# app = Flask(__name__)
+# db_uri = "postgresql:///mikole"
 
 db = SQLAlchemy()
 
@@ -15,15 +17,15 @@ class Client(db.Model):
     user_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     name = db.Column(db.String(50))
     goh_name = db.Column(db.String(50))
-    phone_num = db.Column(db.Integer(10))
+    phone_num = db.Column(db.Integer)
     event_type = db.Column(db.String)
     email = db.Column(db.String, unique=True)
     location = db.Column(db.String)
     added_details = db.Column(db.String)
-    paid = db.Column(db.boolean)
+    paid = db.Column(db.String)
 
     def __repr__(self):
-        return f'<User user_id={self.user_id} phone_num={self.phone_num} email={self.email} event_type{self.event_type} location{}>'
+        return f'<User user_id={self.user_id} phone_num={self.phone_num} email={self.email} event_type{self.event_type} location{self.location}>'
 
 
 class Staffer(db.Model):
@@ -57,9 +59,9 @@ class Party_Package(db.Model):
     cost = db.Column(db.Float)
     total_cost = db.Column(db.Float)
     party_date = db.Column(db.DateTime)
-    user_id = db.Column(db.Integer, db.ForeignKey('clients.user_id')
-    staff_id = db.Column(db.Integer, db.ForeignKey('staff.staff_id')
-    
+    user_id = db.Column(db.Integer, db.ForeignKey('clients.user_id'))
+    staff_id = db.Column(db.Integer, db.ForeignKey('staff.staff_id'))
+
     user = db.relationship('Client', backref='partypackages')
     staff = db.relationship('Staffer', backref='partypackages')
 
@@ -80,9 +82,8 @@ class Party_Purchase_List(db.Model):
     available = db.Column(db.String)
     qty_needed = db.Column(db.Integer)
     party_cost = db.Column(db.Float)
-    purchase_id = db.Column(db.Integer, db.ForeignKey('partypackages.purchase_id')
-    inventory_id = db.Column(db.Integer, db.ForeignKey('inventorys.inventory_id')
-
+    purchase_id = db.Column(db.Integer, db.ForeignKey('partypackages.purchase_id'))
+    inventory_id = db.Column(db.Integer, db.ForeignKey('inventorys.inventory_id'))
     purchase = db.relationship('Party_Package', backref='pplists')
     inventory = db.relationship('Inventory', backref='pplists')
     
@@ -109,7 +110,7 @@ class Inventory(db.Model):
         return f'<Inventory inventory_id={self.inventory_id} name={self.inventory} item_dept={self.item_dept} qty={self.qty}>'
 
 
-def connect_to_db(flask_app, db_uri='postgresql:///ratings', echo=True):
+def connect_to_db(flask_app, db_uri='postgresql:///mikole', echo=True):
     flask_app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
     flask_app.config['SQLALCHEMY_ECHO'] = echo
     flask_app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False

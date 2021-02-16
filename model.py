@@ -14,13 +14,13 @@ class Client(db.Model):
 
     __tablename__ = 'clients'
 
-    user_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    client_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     name = db.Column(db.String(50))
     phone_num = db.Column(db.Integer)
     email = db.Column(db.String, unique=True)
     
     def __repr__(self):
-        return f'<User user_id={self.user_id} name={self.name}>'
+        return f'<Clients client_id={self.client_id} name={self.name}>'
 
 class Event(db.Model):
     """Unique Event selection set by Client."""
@@ -33,15 +33,16 @@ class Event(db.Model):
     added_details = db.Column(db.String)
     location_id = db.Column(db.Integer, db.ForeignKey('locations.location_id'))
     purchase_id = db.Column(db.Integer, db.ForeignKey('partypackages.purchase_id'))
-    user_id = db.Column(db.Integer, db.ForeignKey('clients.user_id'))
+    client_id = db.Column(db.Integer, db.ForeignKey('clients.user_id'))
+    partystaff_id = db.Column(db.Integer, db.ForeignKey('partystaffers.partystaff_id'))
     
     location = db.relationship('Location', backref='events')
-    user = db.relationship('Client', backref='events')
+    client = db.relationship('Client', backref='events')
     partypackage = db.relationship('Party_Package', backref='events')
+    partystaff = db.relationshp('Partystaffer', backref='events')
 
     def __repr__(self):
-        return f'<Event event_id={self.event_id} goh_name={self.goh_name} 
-                                   date_of_event{self.date_of_event} party_package{self.party_package}>'
+        return f'<Event event_id={self.event_id} goh_name={self.goh_name} date_of_event{self.date_of_event} party_package{self.party_package}>'
 
 class Party_Package(db.Model):
     """Party packages."""
@@ -79,18 +80,18 @@ class Party_Purchase_Items(db.Model):
     dept = db.Column(db.Integer)
     name = db.Column(db.String(50))
     purchase_id = db.Column(db.Integer, db.ForeignKey('partypackages.purchase_id'))
-    inventory_id = db.Column(db.Integer, db.ForeignKey('inventorys.inventory_id'))
+    inventory_id = db.Column(db.Integer, db.ForeignKey('inventories.inventory_id'))
 
     party_package = db.relationship('Party_Package', backref='ppilists')
-    inventory = db.Column(db.Integer, db.ForeignKey'Inventory', backrf='inventorys')
-    
+    inventory = db.relationship('Inventory', backref='ppilists')
+
     def __repr__(self):
         return f'<Party_Package_List pp_list_id={self.pp_list_id} name={self.name} dept={self.dept} qty={self.qty} party_cost{self.party_cost}>'
 
 class Inventory(db.Model):
     """In house Inventory."""
 
-    __tablename__ = 'inventorys'
+    __tablename__ = 'inventories'
 
     inventory_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     item_dept = db.Column(db.String)
@@ -101,8 +102,7 @@ class Inventory(db.Model):
     people_per_item = db.Column(db.Integer)
     
     def __repr__(self):
-        return f'<Inventory inventory_id={self.inventory_id} name={self.name} 
-                    item_dept={self.item_dept} people_per_item={self.people_per_item}>'
+        return f'<Inventory inventory_id={self.inventory_id} name={self.name} item_dept={self.item_dept} people_per_item={self.people_per_item}>'
 
 class Staffer(db.Model):
     """Staff Members."""
@@ -119,6 +119,7 @@ class Staffer(db.Model):
     work_status = db.Column(db.String)
     emp_attributes = db.Column(db.String)
     emp_exceptions = db.Column(db.String)
+    availability = db.Column(db.String)
 
     def __repr__(self):
         return f'<Staffer staff_id={self.staff_id} dept={self.dept} fname={self.fname} lname={self.lname}>'
@@ -130,7 +131,7 @@ class PartyStaffer(db.Model):
 
     partystaff_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     event_id = db.Column(db.Integer, db.ForeignKey('events.purchase_id'))
-    staffer_id = db.Column(db.Integer, db.ForignKey('staffers.staff_id'))
+    staffer_id = db.Column(db.Integer, db.ForeignKey('staffers.staff_id'))
     
     def __repr__(self):
         return f'<PartyStaffer partystaff_id={self.partystaff_id}>'
